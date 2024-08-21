@@ -2,41 +2,14 @@ import os, json, argparse
 from datetime import datetime
 
 
-class JsonAction:
-    def __init__(self, obj, file_name):
-        self.data = obj
-        self.file_name = file_name
-
-    def read(self):
-        with open(self.file_name, "r", encoding="utf-8") as file:
-            data = json.load(file)
-        return data
-
-    def write(self, data):
-        current_data = self.read()
-        current_data.append(data)
-        with open(self.file_name, "w", encoding="UTF-8") as file:
-            json.dump(current_data, file, indent=4)
-        print("Task added")
-
-    # def delete(self, item_id):
-    #     current_data = self.read()
-    #     current_data.find()
-
-    def search_by(self, search_type, val) -> list:
-        current_data = self.read()
-        # selected_item
-        selected_item = [item for item in current_data if item[search_type] == val]
-        return selected_item
-
-
 class manage_task:
-    def __init__(self, file_path, file_name, status):
+    def __init__(self, file_path, file_name, status, command):
         self.file_path = file_path
         self.file_name = file_name
         self.complete_path = f"{file_path}{file_name}"
         self.status = status
         self.counter = 0
+        self.command = command
 
     def validate_file(self):
         file_is_valid = os.path.exists(self.complete_path)
@@ -65,21 +38,6 @@ class manage_task:
     def write(self, data):
         with open(self.file_name, "w") as file:
             json.dump(data, file, indent=4)
-            print("READY")
-
-    # def add(self, text):
-    #     data = self.read()
-    #     new_item = {
-    #         "id": self.counter + 1,
-    #         "description": text,
-    #         "status": self.status[0],
-    #         "createdAt": str(datetime.today()),
-    #         "updatedAt": str(
-    #             datetime.today(),
-    #         ),
-    #     }
-    #     # data.append(new_item)
-    #     self.write(data)
 
     def find_by_status(self, status):
         data = self.read()
@@ -98,26 +56,27 @@ class manage_task:
             "createdAt": datetime.now().strftime("%y-%m-%d %H:%M:%S"),
             "updatedAt": datetime.now().strftime("%y-%m-%d %H:%M:%S"),
         }
-        print(data)
         data.append(current_data)
         self.write(data)
-        print(f"✅ Task add with ID: {data}")
+        print(
+            f"✅ Task add with ID: {current_data['id']} || Text: {current_data['description']}"
+        )
 
     def delete(self, task_id: int) -> None:
         data = self.read()
-        clean_list = [item for item in data if item["id"] != task_id]
+        clean_list = [item for item in data if item["id"] != int(task_id)]
         self.write(clean_list)
+        print(f"✅ Task deleted ID: {task_id}")
 
     # TODO: Create a update method
     def update(self, task_id: int, update_value: str) -> None:
         data = self.read()
-        # item_to_update =
         for item in data:
-            if item["id"] == task_id:
+            if int(item["id"]) == int(task_id):
                 item["description"] = update_value
                 item["updatedAt"] = datetime.now().strftime("%y-%m-%d %H:%M:%S")
-        print(data)
         self.write(data)
+        print(f"✅ Task updated to ID: {task_id} || Text: {update_value}")
 
     def change_status(self, task_id, status_updated) -> None:
         list_task = self.read()
@@ -134,23 +93,111 @@ class manage_task:
                 f"ID: {task['id']} || NAME: {task['description']} || STATUS: {task['status']} "
             )
 
+    def shootgun_cli(self) -> None:
+        match self.command.command:
+            case "add":
+                self.create(self.command.text)
+            case "update":
+                self.update(self.command.task_id, self.command.task_text_updated)
+            case "delete":
+                self.delete(self.command.task_id)
+            case "mark-todo":
+                self.change_status(self.command.task_id, self.status[1])
+            case "mark-in-progress":
+                self.change_status(self.command.task_id, self.status[1])
+            case "mark-done":
+                self.change_status(self.command.task_id, self.status[2])
+            case "list":
+                self.list_tasks()
+
+
+def arg_setup():
+
+    # setup to recibe arguments
+    parser = argparse.ArgumentParser(description="This is a CLI to manage your tasks.")
+
+    sub_parser = parser.add_subparsers(
+        dest="command", help="List of commands aviable to use."
+    )
+
+    # crating the commands
+    #  add   task command
+    add_parser = sub_parser.add_parser(
+        "add",
+        help="Command for add a task, pass a str with this command. ex. add 'this is a text'",
+    )
+    add_parser.add_argument("text", default="", help="Text to update")
+
+    #  update task command
+    update_parser = sub_parser.add_parser(
+        "update",
+        help="Command for update a task, pass a str with this command. ex. add 'this is a text'",
+    )
+    update_parser.add_argument("task_id", default="", help="Id to update")
+    update_parser.add_argument(
+        "task_text_updated", default="", help="Text to update the task"
+    )
+    #  delete task command
+    delete_parser = sub_parser.add_parser(
+        "delete",
+        help="Command for delete a task",
+    )
+    delete_parser.add_argument("task_id", default="", help="Id to delete")
+
+    #  mark_in_progress task command
+    mark_in_progress_parser = sub_parser.add_parser(
+        "mark-in-progress",
+        help="Command for mark-in-progress a task",
+    )
+    mark_in_progress_parser.add_argument(
+        "task_id", default="", help="Id to mark-in-progress"
+    )
+
+    #  mark_done task command
+    mark_done = sub_parser.add_parser(
+        "mark-done",
+        help="Command for mark-done a task",
+    )
+    mark_done.add_argument("task_id", default="", help="Id to mark-done")
+
+    #  mark_todo task command
+    mark_todo = sub_parser.add_parser(
+        "mark-todo",
+        help="Command for mark-todo a task",
+    )
+    mark_todo.add_argument("task_id", default="", help="Id to mark-todo")
+
+    # list tasks by status command
+    list_parser = sub_parser.add_parser(
+        "list",
+        help="Command to list tasks by status",
+    )
+    list_parser.add_argument(
+        "status",
+        nargs="?",
+        choices=["done", "todo", "in-progress"],
+        help="Status of tasks to list",
+    )
+
+    return parser.parse_args()
+
 
 def main():
+    command = arg_setup()
     file_path = "./"
     file_name = "data.json"
     status = ["TODO", "IN-PROGRESS", "DONE"]
-
-    # setup to recibe arguments
-    # parser = argparse.ArgumentParser(description="Task tracker...")
-    # parser.add_argument("command", help="The command to run")
-    # parser.add_argument("--optional", type=str, help="This is an optional argument.")
-    # arg = parser.parse_args()
+    data = manage_task(file_path, file_name, status, command)
+    data.validate_file()
+    data.shootgun_cli()
 
     # initialize the data
-    data = manage_task(file_path, file_name, status)
-    data.validate_file()
 
-    data.find_by_status(status[0])
+    # TODO: We only accept existing commands
+    # Shootgun commands
+    # data.shootgun_cli()
+
+    # data.find_by_status(status[0])
     # data.update(3, "Complete Tor Ragnarok")
 
     # data.change_status(3, status[2])
@@ -161,15 +208,7 @@ def main():
     # data.create("Complete The Lengend of Zelda: Minish Cap")
 
     # conditional action
-    # match arg.command:
-    #     case "list":
-    #         print("rosiut")
-    #     case "create":
-    #         print("case 2, crearte")
-
-    # print("Works...", arg.command)
-    return
-    # data.add("Primera vez")
+    transfer_data = {"id": 0, "text": ""}
 
 
 if __name__ == "__main__":

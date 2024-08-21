@@ -1,23 +1,23 @@
 [
     {
         "id": 1,
-        "description": "Complete The Lengend of Zelda: Ocarina of time",
-        "status": "todo",
-        "createdAt": "24-08-20 13:07:02",
-        "updatedAt": "24-08-20 13:07:02"
+        "description": "Call a biggie",
+        "status": "TODO",
+        "createdAt": "24-08-21 15:04:13",
+        "updatedAt": "24-08-21 15:09:51"
+    },
+    {
+        "id": 2,
+        "description": "prueba",
+        "status": "TODO",
+        "createdAt": "24-08-21 15:13:02",
+        "updatedAt": "24-08-21 15:13:02"
     },
     {
         "id": 3,
-        "description": "Complete Tor Ragnarok",
-        "status": "done",
-        "createdAt": "24-08-20 13:07:54",
-        "updatedAt": "24-08-20 13:31:53"
-    },
-    {
-        "id": 4,
-        "description": "Complete The Lengend of Zelda: Minish Cap",
-        "status": "todo",
-        "createdAt": "24-08-20 13:07:54",
-        "updatedAt": "24-08-20 13:07:54"
+        "description": "prueba 1",
+        "status": "TODO",
+        "createdAt": "24-08-21 15:13:05",
+        "updatedAt": "24-08-21 15:13:05"
     }
 ]
