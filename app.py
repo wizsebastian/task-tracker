@@ -141,10 +141,15 @@ def main():
     status = ["TODO", "IN-PROGRESS", "DONE"]
 
     # setup to recibe arguments
-    # parser = argparse.ArgumentParser(description="Task tracker...")
-    # parser.add_argument("command", help="The command to run")
+    parser = argparse.ArgumentParser(description="Task tracker...")
+    parser.add_argument(
+        "command",
+        help="This is a command we need to identify the type of action you need",
+    )
     # parser.add_argument("--optional", type=str, help="This is an optional argument.")
-    # arg = parser.parse_args()
+    arg = parser.parse_args()
+
+    print("ARGS:", arg.command)
 
     # initialize the data
     data = manage_task(file_path, file_name, status)
