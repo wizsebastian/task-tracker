@@ -44,6 +44,3 @@ As a newcomer to Python, this project has been a great learning experience. I've
 
 ## Feedback and Improvements
 I'm always looking to improve my coding skills. If you have any suggestions or feedback, please feel free to open an issue or submit a pull request!
-
-## License
-[MIT License](LICENSE)
